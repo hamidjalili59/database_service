@@ -30,6 +30,23 @@ class DatabaseCommonOperations<R> {
             ),
           );
 
+  /// This method save data with the type [R] to the database service.
+  /// If some data is already in the database then it will override data.
+  Future<Either<DatabaseError, NoParam>> removeData({
+    required String fieldKey,
+    required R value,
+  }) async =>
+      await databaseService.delete(boxName, fieldKey).then(
+            (res) => res.fold(
+              (dbError) => left<DatabaseError, NoParam>(
+                dbError,
+              ),
+              (response) => right<DatabaseError, NoParam>(
+                const NoParam(),
+              ),
+            ),
+          );
+
   /// Retrive the data from the database.
   Future<Either<DatabaseError, R?>> getCachedData({
     required String fieldKey,
