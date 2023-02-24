@@ -2,14 +2,12 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:database_service/src/database_errors.dart';
-import 'package:database_service/src/database_security.dart';
 import 'package:database_service/src/database_service.dart';
 import 'package:database_service/src/no_param.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:path_provider/path_provider.dart' as path_provider;
 
 class DatabaseServiceImpl extends DatabaseService {
-  final DatabaseSecurity _databaseSecurity = DatabaseSecurity();
 
   DatabaseServiceImpl();
 
@@ -28,7 +26,6 @@ class DatabaseServiceImpl extends DatabaseService {
   @override
   Future initialize() async {
     try {
-      await _databaseSecurity.createSecureKey();
 
       /// Initialize the database with a path
       Hive.initFlutter((await _getDatabaseDirectory()).path);
@@ -43,16 +40,8 @@ class DatabaseServiceImpl extends DatabaseService {
   @override
   Future<Box> openBox(String boxName) async {
     try {
-      final HiveCipher? secureKey =
-          await _databaseSecurity.readEncryptionCipher();
-      if (secureKey == null) {
-        throw DatabaseError(
-          errorMessage: 'read_secure_key_failed',
-        );
-      }
       return await Hive.openBox(
         boxName,
-        encryptionCipher: secureKey,
       );
     } catch (e) {
       throw DatabaseError(errorMessage: e.toString());
@@ -240,7 +229,6 @@ class DatabaseServiceImpl extends DatabaseService {
     try {
       final dbDirectory = await _getDatabaseDirectory();
       await dbDirectory.delete(recursive: true);
-      await _databaseSecurity.deleteSecureKey();
       return const Right(NoParam());
     } catch (e) {
       return Left(DatabaseError(errorMessage: e.toString()));
