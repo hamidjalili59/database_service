@@ -9,8 +9,8 @@ dependencies:
   dartz: ^0.10.1
   flutter:
     sdk: flutter
-  hive: ^3.0.0-dev
-  hive_flutter: ^2.0.0-dev
+  hive: ^2.2.3
+  hive_flutter: ^1.1.0
   path_provider: ^2.0.15
 
 dev_dependencies:
